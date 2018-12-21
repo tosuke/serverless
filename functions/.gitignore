@@ -1,0 +1,6 @@
+## Compiled JavaScript files
+**/*.js
+**/*.js.map
+
+## Secret
+config.json
