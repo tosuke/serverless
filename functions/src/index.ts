@@ -16,48 +16,46 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-function lazy(path: string) {
-  return async (req, res) => {
-    try {
-      const request = verifyBody(req.body)
+async function slackCommand(req, res): Promise<void> {
+  try {
+    const request = verifyBody(req.body)
 
-      const task = import(path)
-        .then(a => a.default || a)
-        .then(f => f(request))
+    const task = import(`./${config.commands[request.command].path}`)
+      .then(a => a.default || a)
+      .then(f => f(request))
 
-      const result = await task
-      if (result) {
-        if (result.responseType === 'ephemeral') {
-          await slack.chat.postEphemeral({
-            channel: request.channel_id,
-            user: request.user_id,
-            ...result 
-          })
-        } else {
-          await slack.chat.postMessage({
-            channel: request.channel_id,
-            ...result
-          })
-        }
+    const result = await task
+    if (result) {
+      if (result.responseType === 'ephemeral') {
+        await slack.chat.postEphemeral({
+          channel: request.channel_id,
+          user: request.user_id,
+          ...result
+        })
+      } else {
+        await slack.chat.postMessage({
+          channel: request.channel_id,
+          ...result
+        })
       }
-      res.end()
-    } catch (err) {
-      console.error(err)
-      res.json({
-        text: err.toString()
-      })
     }
+    res.end()
+  } catch (err) {
+    console.error(err)
+    res.json({
+      text: err.toString()
+    })
   }
 }
 
 function verifyBody(body: any): Request {
   if (body != null) {
     const request = body as Request
-    if (request.command != null && request.token === config.commands[request.command].TOKEN) {
+    if (request.command != null && request.token === config.commands[request.command].token) {
       return request
     }
   }
   throw new Error('invalid credentials')
 }
 
-export const gisou = functions.https.onRequest(lazy('./gisou'))
+export const slackcmd = functions.https.onRequest(slackCommand)
