@@ -3,7 +3,8 @@ import * as config from './config.json'
 import { User, EmojiMap } from './type'
 
 const userMap = new Map<string, User>()
-let emojiMap: EmojiMap
+let defaultEmojiMap: EmojiMap
+let customEmojiMap: EmojiMap
 
 export const slack = new WebClient(config.SLACK_API_TOKEN)
 
@@ -16,29 +17,35 @@ export async function getUserInfo(userid: string): Promise<User> {
   return userMap.get(userid)
 }
 
-export async function getEmoji(): Promise<EmojiMap> {
-  if (emojiMap == null) {
-    const result = await slack.emoji.list()
-    const tmp: EmojiMap = {
-      ...require('./emoji.json'),
-      ...(result as any).emoji
-    }
-
-    for(const [key, val] of Object.entries(tmp)) {
-      tmp[key] = resolveEmoji(val, tmp)
-    }
-
-    emojiMap = tmp
+export async function getEmojiUrl(emoji: string): Promise<string | undefined> {
+  if (defaultEmojiMap == null) {
+    defaultEmojiMap = await import('./emoji.json')
   }
-  return emojiMap
+  if (emoji in defaultEmojiMap) {
+    const resolved = await resolveEmoji(defaultEmojiMap[emoji])
+    defaultEmojiMap[emoji] = resolved
+    return resolved
+  }
+
+  if (customEmojiMap == null) {
+    const result = await slack.emoji.list()
+    customEmojiMap = (result as any).emoji
+  }
+  if (emoji in customEmojiMap) {
+    const resolved = await resolveEmoji(customEmojiMap[emoji])
+    customEmojiMap[emoji] = resolved
+    return resolved
+  }
+
+  return undefined
 }
 
-function resolveEmoji(emoji: string, map: EmojiMap): string {
+async function resolveEmoji(emoji: string): Promise<string> {
   if (/^http/.test(emoji)) {
     return emoji
   } else if(/^alias/.test(emoji)) {
     const [, aliasTo] = /^alias:(.*)$/.exec(emoji)
-    return resolveEmoji(aliasTo, map)
+    return await getEmojiUrl(aliasTo)
   } else {
     return `https://twemoji.maxcdn.com/2/72x72/${emoji}.png`
   }

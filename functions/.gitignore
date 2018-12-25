@@ -1,6 +1,8 @@
 ## Compiled JavaScript files
-**/*.js
-**/*.js.map
+lib/*.js
+lib/*.js.map
+lib/*.json
+
 
 ## Secret
 config.json
