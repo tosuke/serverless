@@ -1,11 +1,20 @@
 import * as functions from 'firebase-functions'
+import axios from 'axios'
 import * as config from './config.json'
 import { Request } from './type'
 import { slack } from './client'
 
-async function slackCommand(req, res): Promise<void> {
+async function slackCommand(req: functions.Request, res: functions.Response): Promise<void> {
+  let timeout: boolean = false
   try {
     const request = verifyBody(req.body)
+
+    const timer = setTimeout(() => {
+      axios.post(request.response_url, {
+        text: 'plz wait...'
+      })
+      timeout = true
+    }, 1800);
 
     const task = import(`./command/${config.slack.commands[request.command].path}`)
       .then(a => a.default || a)
@@ -26,6 +35,7 @@ async function slackCommand(req, res): Promise<void> {
         })
       }
     }
+    clearTimeout(timer)
     res.end()
   } catch (err) {
     console.error(err)

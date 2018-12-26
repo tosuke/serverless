@@ -14,18 +14,7 @@ export default async (req: Request) => {
   const [, src] = regexp.exec(req.text)
   const url = new URL(src).toString()
 
-  const page = await getPage()
-  page.setUserAgent(USER_AGENT)
-  page.setViewport({ width: 1920, height: 1080 })
-  await page.goto(url, {
-    timeout: 10 * 1000,
-    waitUntil: 'networkidle0'
-  })
-  const buffer = await page.screenshot({
-    type: 'jpeg',
-    encoding: 'binary'
-  })
-  releasePage(page)
+  const buffer = await screenshot(url)
 
   const id = nanoid()
   const objectName = `USLACKBOT/screenshots/${id}.jpg`
@@ -42,5 +31,24 @@ export default async (req: Request) => {
         image_url: imageUrl
       }
     ]
+  }
+}
+
+async function screenshot(url: string): Promise<Buffer> {
+  const page = await getPage()
+  try {
+    page.setUserAgent(USER_AGENT)
+    page.setViewport({ width: 1920, height: 1080 })
+    await page.goto(url, {
+      timeout: 10 * 1000,
+      waitUntil: 'networkidle0'
+    })
+    const buffer = await page.screenshot({
+      type: 'jpeg',
+      encoding: 'binary'
+    })
+    return buffer
+  } finally {
+    releasePage(page)
   }
 }
