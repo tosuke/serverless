@@ -3,19 +3,6 @@ import * as config from './config.json'
 import { Request } from './type'
 import { slack } from './client'
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise(res => {
-    setTimeout(res, ms)
-  })
-}
-
 async function slackCommand(req, res): Promise<void> {
   try {
     const request = verifyBody(req.body)
@@ -59,3 +46,10 @@ function verifyBody(body: any): Request {
 }
 
 export const slackcmd = functions.https.onRequest(slackCommand)
+
+export const screenshotcmd = functions
+  .runWith({
+    timeoutSeconds: 300,
+    memory: '1GB'
+  })
+  .https.onRequest(slackCommand)
