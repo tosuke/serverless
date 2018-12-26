@@ -1,6 +1,6 @@
-import { Request } from './type'
-import { getPage, releasePage } from './browser'
-import { upload, createURL } from './storage'
+import { Request } from '../type'
+import { getPage, releasePage } from '../browser'
+import { upload, createURL } from '../storage'
 import { URL } from 'url'
 import nanoid = require('nanoid')
 

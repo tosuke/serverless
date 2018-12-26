@@ -1,5 +1,5 @@
-import { Request } from './type'
-import { getEmojiUrl, getUserInfo } from './client'
+import { Request } from '../type'
+import { getEmojiUrl, getUserInfo } from '../client'
 
 const regexp = /:([^:]+):/
 

@@ -7,7 +7,7 @@ async function slackCommand(req, res): Promise<void> {
   try {
     const request = verifyBody(req.body)
 
-    const task = import(`./${config.commands[request.command].path}`)
+    const task = import(`./command/${config.slack.commands[request.command].path}`)
       .then(a => a.default || a)
       .then(f => f(request))
 
@@ -38,7 +38,7 @@ async function slackCommand(req, res): Promise<void> {
 function verifyBody(body: any): Request {
   if (body != null) {
     const request = body as Request
-    if (request.command != null && request.token === config.commands[request.command].token) {
+    if (request.command != null && request.token === config.slack.commands[request.command].token) {
       return request
     }
   }

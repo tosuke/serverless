@@ -6,7 +6,7 @@ const userMap = new Map<string, User>()
 let defaultEmojiMap: EmojiMap
 let customEmojiMap: EmojiMap
 
-export const slack = new WebClient(config.SLACK_API_TOKEN)
+export const slack = new WebClient(config.slack.APIToken)
 
 export async function getUserInfo(userid: string): Promise<User> {
   if (!userMap.has(userid)) {

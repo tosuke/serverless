@@ -1,5 +1,5 @@
-import { Request } from './type'
-import { getUserInfo } from './client'
+import { Request } from '../type'
+import { getUserInfo } from '../client'
 
 export default async (req: Request) => {
   const regexp = /<@(\w+)\|[^>]+>(.*)$/
