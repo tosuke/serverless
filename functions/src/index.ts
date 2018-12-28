@@ -14,7 +14,7 @@ async function slackCommand(req: functions.Request, res: functions.Response): Pr
         text: 'plz wait...'
       })
       timeout = true
-    }, 1800);
+    }, 1600);
 
     const task = import(`./command/${config.slack.commands[request.command].path}`)
       .then(a => a.default || a)
@@ -39,7 +39,7 @@ async function slackCommand(req: functions.Request, res: functions.Response): Pr
     res.end()
   } catch (err) {
     console.error(err)
-    res.json({
+    axios.post(req.body.response_url, {
       text: err.toString()
     })
   }

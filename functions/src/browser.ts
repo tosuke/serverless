@@ -9,7 +9,7 @@ export async function getBrowser(): Promise<Browser> {
 
     const launchOptions = {
       headless: isDebug ? false : true,
-      args: ['--no-sandbox']
+      args: ['--no-sandbox', '--lang=ja-JP,ja']
     }
 
     browser = await launchBrowser(launchOptions)

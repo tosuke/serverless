@@ -40,7 +40,7 @@ async function screenshot(url: string): Promise<Buffer> {
     page.setUserAgent(USER_AGENT)
     page.setViewport({ width: 1920, height: 1080 })
     await page.goto(url, {
-      timeout: 10 * 1000,
+      timeout: 30 * 1000,
       waitUntil: 'networkidle0'
     })
     const buffer = await page.screenshot({
